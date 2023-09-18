@@ -1,0 +1,239 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Profile Page {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card card-user">
+        <div class="card-header">
+          <h5 class="title">Creator</h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            <div class="author">
+              <div class="block block-one"></div>
+              <div class="block block-two"></div>
+              <div class="block block-three"></div>
+              <div class="block block-four"></div>
+              <div class="fileinput-new thumbnail img-circle">
+                <img class='bet-avatar' src="{% if bet.creator.photo == null %}/static/assets/img/default-avatar.png{% else %}{{ bet.creator.photo }}{% endif %}" alt="...">
+              </div>
+              <br>
+              <a href="javascript:void(0)">
+                <h5 class="title">
+                    {{ bet.creator.user.username }}
+                </h5>
+              </a>
+              <p class="description">
+                {{ bet.creator.user.email }}
+              </p>
+            </div>
+          </p>
+        </div>
+      </div>
+      <div class="card card-chart card-chart-pie" style="{% if bet.is_active == True %}display: none;{% endif %}">
+        <div class="card-header">
+          <h5 class="card-category">Profits/Return</h5>
+        </div>
+        <div class="card-body">
+          <div class="chart-area">
+            <canvas id="ActiveChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="title">Bet Detail</h5>
+        </div>
+        <div class="card-body">
+          <div class='row'>
+            <div class="col-md-6">
+              <div class="card card-testimonial">
+                <div class="card-header card-header-avatar">
+                  <a href="#">
+                    <img class="img img-raised" style="{% if bet.artist1.pk == bet.winner_artist %}border: 5px solid green;{% endif %}" src="{% if bet.artist1.image_url == null %}/static/assets/img/default-avatar.png{% else %}{{ bet.artist1.image_url }}{% endif %}" alt="Card image">
+                  </a>
+                </div>
+                <div class="card-body">
+                  <p class="card-description">
+                    {{ bet.artist1.genres }}
+                  </p>
+                  
+                </div>
+                <div class="card-footer">
+                  <h4 class="card-title">Name: {{ bet.artist1.name }}</h4>
+                  <p class="category">Followers: {{ bet.artist1.followers }}</p>
+                  <!-- <p class="category">{{ bet.artist1.popularity }}</p> -->
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card card-testimonial">
+                <div class="card-header card-header-avatar">
+                  <a href="#">
+                    <img class="img img-raised"style="{% if bet.artist2.pk == bet.winner_artist %}border: 5px solid green;{% endif %}" src="{% if bet.artist2.image_url == null %}/static/assets/img/default-avatar.png{% else %}{{ bet.artist2.image_url }}{% endif %}" alt="Card image">
+                  </a>
+                </div>
+                <div class="card-body">
+                  <p class="card-description">
+                    {{ bet.artist2.genres }}
+                  </p>
+                </div>
+                <div class="card-footer">
+                  <h4 class="card-title">Name: {{ bet.artist2.name }}</h4>
+                  <p class="category">Followers: {{ bet.artist2.followers }}</p>
+                  <!-- <p class="category">{{ bet.artist2.popularity }}</p> -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <br>
+          <div class="table-responsive">
+            <table class="table">
+              <thead class="text-primary">
+                <tr>
+                  <th>No</th>
+                  <th class="text-center">#</th>
+                  <th>Name</th>
+                  <th class="text-center">Bet Artist</th>
+                  <th>Bet Chip</th>
+                  <th class="text-center">Win</th>
+                  <th>Return</th>
+                </tr>
+              </thead>
+              <tbody>
+                <script>
+                  var wagers = 0
+                  var returns = 0
+                </script>
+                {% for bet_user in bet_users %}
+                  <script>
+                    wagers += parseFloat('{{bet_user.bet_chip}}')
+                    returns += parseFloat('{{ bet_user.return_chip }}')
+                  </script>
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="text-center">
+                      <div class="photo">
+                        <img src="{% if bet_user.user.photo == null %}/static/assets/img/default-avatar.png{% else %}{{ bet_user.user.photo }}{% endif %}" alt="photo">
+                      </div>
+                    </td>
+                    <td>{{ bet_user.user.user.username }}</td>
+                    <td class="text-center">
+                      <div class="photo" data-toggle="tooltip" title="{{ bet_user.bet_artist.name }}">
+                        <img src="{% if bet_user.bet_artist.image_url == null %}/static/assets/img/default-avatar.png{% else %}{{ bet_user.bet_artist.image_url }}{% endif %}" alt="photo">
+                      </div>
+                    </td>
+                    <td>
+                        {{ bet_user.bet_chip }}
+                    </td>
+                    <td class="text-center">
+                        {% if bet_user.is_winner and bet_user.is_end %}
+                            <button class="btn btn-icon btn-round btn-success">
+                                <i class="tim-icons icon-trophy"> </i>
+                            </button>
+                        {% elif bet_user.is_winner == False and bet_user.is_end %}
+                            <button class="btn btn-icon btn-round btn-danger btn-sm">
+                              <i class="tim-icons icon-simple-remove"> </i>
+                            </button>
+                        {% elif bet_user.is_winner == None and bet_user.is_end %}
+                            <button class="btn btn-icon btn-round btn-primary btn-sm">
+                              <i class="tim-icons icon-refresh-02"> </i>
+                            </button>
+                        {% else %}
+                            <!-- <button class="btn btn-icon btn-round btn-danger btn-sm">
+                              <i class="tim-icons icon-simple-remove"> </i>
+                            </button> -->
+                        {% endif %}
+                    </td>
+                    <td>{{ bet_user.return_chip }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="javascript:history.back()"><button type="button" class="btn btn-fill btn-info">Back to Bets</button></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+  <script>
+    $(document).ready(function(){
+      var ctx = document.getElementById("ActiveChart").getContext("2d");
+
+      var myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Profits', 'Returns'],
+          datasets: [{
+            label: "Emails",
+            pointRadius: 0,
+            pointHoverRadius: 0,
+            backgroundColor: ['#00c09d', 'grey'],
+            borderWidth: 0,
+            data: [wagers-returns, returns]
+          }]
+        },
+        options: {
+          cutoutPercentage: 70,
+          legend: {
+            display: false
+          },
+
+          tooltips: {
+            backgroundColor: '#f5f5f5',
+            titleFontColor: '#333',
+            bodyFontColor: '#666',
+            bodySpacing: 4,
+            xPadding: 12,
+            mode: "nearest",
+            intersect: 0,
+            position: "nearest"
+          },
+
+          scales: {
+            yAxes: [{
+              display: 0,
+              ticks: {
+                display: false
+              },
+              gridLines: {
+                drawBorder: false,
+                zeroLineColor: "transparent",
+                color: 'rgba(255,255,255,0.05)'
+              }
+
+            }],
+
+            xAxes: [{
+              display: 0,
+              barPercentage: 1.6,
+              gridLines: {
+                drawBorder: false,
+                color: 'rgba(255,255,255,0.1)',
+                zeroLineColor: "transparent"
+              },
+              ticks: {
+                display: false,
+              }
+            }]
+          },
+        }
+      });
+    })
+  </script>
+{% endblock javascripts %}

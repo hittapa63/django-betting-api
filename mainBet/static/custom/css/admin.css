@@ -1,0 +1,43 @@
+.padding-40 {
+    padding: 40px;
+}
+
+.width-50 {
+    width: 50%;
+}
+
+.sidebar .logo {
+    padding: 10px !important;
+}
+
+.page-center {
+    justify-content: center;
+}
+
+.bet-avatar{
+    width: 200px;
+    height: 200px;
+    border: 5px solid #2b3553;
+    background-color: transparent;
+    border-radius: 50%;
+}
+
+.card .okbet-avatar {
+    width: 60px !important;
+    height: 60px !important;
+}
+
+.user-verify-mark {
+    padding-top: 3px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 23px;
+    font-weight: bold;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    text-align: center;
+    z-index: 2;
+    color: white;
+}

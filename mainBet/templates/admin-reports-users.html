@@ -1,0 +1,100 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="row">
+      {% for user in users %}
+          <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="card card-user">
+              <div data-toggle="tooltip" title="{{ user.user.username }}'s Status" class="user-verify-mark" style='background-color: {% if user.status == 1 %} #00f2c3 {% else %} #ec250d {% endif %};'>
+                <i class='tim-icons {% if user.status == 1 %} icon-check-2 {% else %} icon-simple-remove {% endif %}'></i>
+              </div>
+              <div class="card-body">
+                <p class="card-text">
+                  <div class="author">
+                    <div class="block block-one"></div>
+                    <div class="block block-two"></div>
+                    <div class="block block-three"></div>
+                    <div class="block block-four"></div>
+                    <a href="#">
+                      <img class="avatar" src="{% if user.photo == null %}/static/assets/img/default-avatar.png{% else %}{{ user.photo }}{% endif %}" alt="...">
+                      <h5 class="title">
+                          {{ user.user.username }}
+                      </h5>
+                    </a>
+                    <p class="description">
+                      {{ user.user.email }}
+                    </p>
+                  </div>
+                </p>
+                <div class="card-description text-center">
+                  <h5>Exp: {{ user.exp }},  Chip: {{ user.chip }}</h5>
+                  <h5>Create Bets: {{ user.bets }},  Bets: {{ user.winner_times|add:user.tie_times|add:user.lose_times }}</h5>
+                  <h5>Win Times: {{ user.winner_times }},  Tie Times: {{ user.tie_times }},  Lose Times: {{ user.lose_times }}</h5>
+                </div>
+              </div>
+              <div class='card-footer text-right'>
+                <a href="/admin/reports/user/{{ user.user.pk }}">More...</a>
+              </div>
+            </div>
+          </div>
+      {% endfor %}
+
+      <ul class="col-md-12 pagination page-center">
+        {% if users.has_previous %}
+          <li class="page-item">
+              <a class="page-link" href="?page=1" aria-label="Previous">
+                  first
+              </a>
+          </li>
+          <li class="page-item">
+              <a class="page-link" href="?page={{ users.previous_page_number }}" aria-label="Previous">
+                  <span aria-hidden="true"><i class="tim-icons icon-double-left" aria-hidden="true"></i></span>
+              </a>
+          </li>
+        {% endif %}
+        {% for num in users.paginator.page_range %}
+          {% ifequal num users.number %}
+              <li class="page-item active">
+                  <a class="page-link" href="?page={{num}}">{{ num }}</a>
+              </li>
+          {% else %}
+              <li class="page-item">
+                  <a class="page-link" href="?page={{num}}">{{ num }}</a>
+              </li>
+          {% endifequal %} 
+        {% endfor %}
+        {% if users.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ users.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true"><i class="tim-icons icon-double-right" aria-hidden="true"></i></span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ users.paginator.num_pages }}" aria-label="Next">
+                    last
+                </a>
+            </li>
+        {% endif %}
+      </ul>
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <script>
+    $.ajaxSetup({
+        headers: { "X-CSRFToken": '{{csrf_token}}' }
+    })
+    user_update = "{% url 'admin/users' %}"
+  </script>
+
+{% endblock javascripts %}

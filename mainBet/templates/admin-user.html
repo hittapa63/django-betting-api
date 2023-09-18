@@ -1,0 +1,165 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Profile Page {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<form role="form" method="post" action="">
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="title">Edit Profile</h5>
+        </div>
+        <div class="card-body">
+          {% csrf_token %}
+          <input type="hidden" name="photo" value>
+          <div class="row">
+            <div class="col-md-5 pr-md-1">
+              <div class="form-group">
+                <label>User ID (disabled)</label>
+                <input type="text" class="form-control" disabled="" name="id" value="{{ user.user.pk }}">
+              </div>
+            </div>
+            <div class="col-md-3 px-md-1">
+              <div class="form-group">
+                <label>Username</label>
+                <input type="text" class="form-control" name="username" value="{{ user.user.username }}" required>
+              </div>
+            </div>
+            <div class="col-md-4 pl-md-1">
+              <div class="form-group">
+                <label>Email address</label>
+                <input type="email" class="form-control" name="email" value="{{ user.user.email }}" required>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 pr-md-1">
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" class="form-control" name="first_name" value="{{  user.user.first_name }}">
+              </div>
+            </div>
+            <div class="col-md-6 pl-md-1">
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" class="form-control" name="last_name" value="{{ user.user.last_name }}">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>Address</label>
+                <input type="text" class="form-control" name="address" placeholder="Home Address" value="{{ user.address }}">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 pr-md-1">
+              <div class="form-group">
+                <label>Bets</label>
+                <input type="number" class="form-control" name="bets" value="{{ user.bets }}">
+              </div>
+            </div>
+            <div class="col-md-4 px-md-1">
+              <div class="form-group">
+                <label>Exp</label>
+                <input type="number" name="exp" class="form-control" value="{{ user.exp }}">
+              </div>
+            </div>
+            <div class="col-md-4 pl-md-1">
+              <div class="form-group">
+                <label>Chip</label>
+                <input type="number" class="form-control" name="chip" value={{ user.chip }}>
+              </div>
+            </div>
+          </div>
+          <div class='row'>
+            <div class="col-md-4 pr-md-1">
+              <div class="form-group">
+                <label>Win Times</label>
+                <input type="number" name="winner_times" class="form-control" value={{ user.winner_times }}>
+              </div>
+            </div>
+            <div class="col-md-4 px-md-1">
+              <div class="form-group">
+                <label>Tie Times</label>
+                <input type="number" class="form-control" name="tie_times" value={{ user.tie_times }}>
+              </div>
+            </div>
+            <div class="col-md-4 pl-md-1">
+              <div class="form-group">
+                <label>Lose Times</label>
+                <input type="number" class="form-control" name="lose_times" value={{ user.lose_times }}>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button type="submit" class="btn btn-fill btn-primary">Save</button>
+          <a href="javascript:history.back()"><button type="button" class="btn btn-fill btn-danger">Cancel</button></a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card card-user">
+        <div class="card-body">
+          <p class="card-text">
+            <div class="author">
+              <div class="block block-one"></div>
+              <div class="block block-two"></div>
+              <div class="block block-three"></div>
+              <div class="block block-four"></div>
+              <div class="fileinput fileinput-new text-center" data-provides="fileinput">
+                <div class="fileinput-new thumbnail img-circle">
+                  <img src="{% if user.photo == null %}/static/assets/img/default-avatar.png{% else %}{{ user.photo }}{% endif %}" alt="...">
+                </div>
+                <div class="fileinput-preview fileinput-exists thumbnail img-circle"></div>
+                <div>
+                  <span class="btn btn-round btn-rose btn-file">
+                    <span class="fileinput-new">Add Photo</span>
+                    <span class="fileinput-exists">Change</span>
+                    <input type="file" name="..." />
+                  </span>
+                  <br />
+                  <a href="#pablo" class="btn btn-danger btn-round fileinput-exists" data-dismiss="fileinput"><i class="fa fa-times"></i> Remove</a>
+                </div>
+              </div>
+              <a href="javascript:void(0)">
+                <h5 class="title">
+                    {{ user.user.username }}
+                </h5>
+              </a>
+              <p class="description">
+                {{ user.user.email }}
+              </p>
+            </div>
+          </p>
+          <div class="card-description">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+  <script>
+    $(document).ready(function(){
+      $('form').submit(function(){
+        let base64_image = $('.fileinput-preview').find('img').attr('src')
+        $('input[name="photo"]').val(base64_image)
+        return true
+      })
+    })
+  </script>
+{% endblock javascripts %}

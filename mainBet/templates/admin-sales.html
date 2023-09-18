@@ -1,0 +1,307 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class='row'>
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-stats">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-3">
+              <div class="info-icon text-center icon-warning">
+                <i class="tim-icons icon-coins"></i>
+              </div>
+            </div>
+            <div class="col-9">
+              <div class="numbers">
+                <p class="card-category">Total Profits</p>
+                <h3 class="card-title">{{ bet_chip_info.0.total_profits }} chips</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="card-footer">
+          <hr>
+          <div class="stats">
+            <i class="tim-icons icon-refresh-01"></i> Go to Detail
+          </div>
+        </div> -->
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-stats">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-5">
+              <div class="info-icon text-center icon-primary">
+                <i class="tim-icons icon-shape-star"></i>
+              </div>
+            </div>
+            <div class="col-7">
+              <div class="numbers">
+                <p class="card-category">Total Wagers</p>
+                <h3 class="card-title">{{ bet_chip_info.0.total_wagers }} chips</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="card-footer">
+          <hr>
+          <div class="stats">
+            <i class="tim-icons icon-refresh-01"></i> Go to Detail
+          </div>
+        </div> -->
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-stats">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-5">
+              <div class="info-icon text-center icon-success">
+                <i class="tim-icons icon-single-02"></i>
+              </div>
+            </div>
+            <div class="col-7">
+              <div class="numbers">
+                <p class="card-category">Total Returns</p>
+                <h3 class="card-title">{{ bet_chip_info.0.total_returns }} chips</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="card-footer">
+          <hr>
+          <div class="stats">
+            <i class="tim-icons icon-refresh-01"></i> Go to Detail
+          </div>
+        </div> -->
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-stats">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-5">
+              <div class="info-icon text-center icon-danger">
+                <i class="tim-icons icon-chart-pie-36"></i>
+              </div>
+            </div>
+            <div class="col-7">
+              <div class="numbers">
+                <p class="card-category">Bets per User</p>
+                <h3 class="card-title">{{ info.bets_users }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="card-footer">
+          <hr>
+          <div class="stats">
+            <i class="tim-icons icon-refresh-01"></i> Go to Detail
+          </div>
+        </div> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class='col-md-3'>
+      <div class="card card-chart card-chart-pie">
+        <div class="card-header">
+          <h5 class="card-category">Profits/Returns</h5>
+        </div>
+        <div class="card-body">
+          <div class="chart-area">
+            <canvas id="BetChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='col-md-9'>
+      <div class="card card-chart">
+        <div class="card-header">
+          <h5 class="card-category">Monthly Detail</h5>
+        </div>
+        <div class="card-body">
+          <div class="chart-area">
+            <canvas id="MultipleBarsChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <script>
+    $(document).ready(function() {
+      var total_chip = [0,0]
+      var month_profit_chip = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      var month_return_chip = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]      
+      var is_checked = false
+      "{% for betchipinfo in bet_chip_info %}"
+        if (!is_checked) {
+          total_chip[0] = '{{ betchipinfo.total_profits }}'
+          total_chip[1] = '{{ betchipinfo.total_returns }}'
+        }
+        is_checked = true
+        month_profit_chip['{{betchipinfo.month}}'-1] = '{{ betchipinfo.month_profits }}' 
+        month_return_chip['{{betchipinfo.month}}'-1] = '{{ betchipinfo.month_returns }}'        
+      "{% endfor %}"
+      console.log(total_chip)
+      initChartPageCharts(total_chip, month_profit_chip, month_return_chip)
+    })
+    function initChartPageCharts(t_c, m_p, m_r) {
+      var ctx = document.getElementById("BetChart").getContext("2d");
+
+      var myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Profits', 'Returns'],
+          datasets: [{
+            label: "Emails",
+            pointRadius: 0,
+            pointHoverRadius: 0,
+            backgroundColor: ['#e14eca', '#00f2c3'],
+            borderWidth: 0,
+            data: t_c
+          }]
+        },
+        options: {
+          cutoutPercentage: 70,
+          legend: {
+            display: false
+          },
+
+          tooltips: {
+            backgroundColor: '#f5f5f5',
+            titleFontColor: '#333',
+            bodyFontColor: '#666',
+            bodySpacing: 4,
+            xPadding: 12,
+            mode: "nearest",
+            intersect: 0,
+            position: "nearest"
+          },
+
+          scales: {
+            yAxes: [{
+              display: 0,
+              ticks: {
+                display: false
+              },
+              gridLines: {
+                drawBorder: false,
+                zeroLineColor: "transparent",
+                color: 'rgba(255,255,255,0.05)'
+              }
+
+            }],
+
+            xAxes: [{
+              display: 0,
+              barPercentage: 1.6,
+              gridLines: {
+                drawBorder: false,
+                color: 'rgba(255,255,255,0.1)',
+                zeroLineColor: "transparent"
+              },
+              ticks: {
+                display: false,
+              }
+            }]
+          },
+        }
+      });
+      gradientBarChartConfiguration = {
+        maintainAspectRatio: false,
+        legend: {
+          display: false
+        },
+
+        // tooltips: {
+        //   backgroundColor: '#f5f5f5',
+        //   titleFontColor: '#333',
+        //   bodyFontColor: '#666',
+        //   bodySpacing: 4,
+        //   xPadding: 12,
+        //   mode: "nearest",
+        //   intersect: 0,
+        //   position: "nearest"
+        // },
+        responsive: true,
+        scales: {
+          yAxes: [{
+            gridLines: {
+              drawBorder: false,
+              color: 'rgba(253,93,147,0.1)',
+              zeroLineColor: "transparent",
+            },
+            ticks: {
+              suggestedMin: 60,
+              suggestedMax: 125,
+              padding: 20,
+              fontColor: "#9e9e9e"
+            }
+          }],
+
+          xAxes: [{
+            gridLines: {
+              drawBorder: false,
+              color: 'rgba(253,93,147,0.1)',
+              zeroLineColor: "transparent",
+            },
+            ticks: {
+              padding: 20,
+              fontColor: "#9e9e9e"
+            }
+          }]
+        }
+      };
+
+      var ctx = document.getElementById("MultipleBarsChart").getContext("2d");
+
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        responsive: true,
+        data: {
+          labels: [ 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+          datasets: [{
+              label: "Profits",
+              fill: true,
+              backgroundColor: '#ff8a76',
+              hoverBackgroundColor: ' #ff8a76',
+              borderColor: '#ff8a76',
+              borderWidth: 2,
+              borderDash: [],
+              borderDashOffset: 0.0,
+              data: m_p,
+            },
+            {
+              label: "Returns",
+              fill: true,
+              backgroundColor: '#2782f0',
+              hoverBackgroundColor: ' #2782f0',
+              borderColor: '#2782f0',
+              borderWidth: 2,
+              borderDash: [],
+              borderDashOffset: 0.0,
+              data: m_r,
+            }
+          ]
+        },
+        options: gradientBarChartConfiguration
+      });
+    }
+  </script>
+
+{% endblock javascripts %}

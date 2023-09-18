@@ -1,0 +1,11 @@
+# cache
+.DS_Store
+.cache
+__pycache__
+
+# log
+*.log
+
+# environment
+dev.md
+.env

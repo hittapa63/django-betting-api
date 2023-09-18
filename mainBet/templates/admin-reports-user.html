@@ -1,0 +1,169 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock title %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="row">
+      <div class="col-lg-9">
+        <div class='card'>
+          <div class='card-header'>
+            <h4>Created Bets</h4>
+          </div>
+          <div class='card-body'>
+            <div class='row'>
+              {% for bet in bets %}
+                <div class='col-md-3'>
+                  <a href='/admin/bet/{{bet.pk}}'>
+                    <div class='card' style="min-height: 200px;">
+                      <div class='card-body'>
+                        <div class='text-center'>
+                          <img class="avatar okbet-avatar" src="{% if bet.artist1.image_url == null %}/static/assets/img/default-avatar.png{% else %}{{ bet.artist1.image_url }}{% endif %}" alt="...">
+                          <img class="avatar okbet-avatar" src="{% if bet.artist2.image_url == null %}/static/assets/img/default-avatar.png{% else %}{{ bet.artist2.image_url }}{% endif %}" alt="...">
+                        </div>
+                        <div class='text-center'>
+                          <h6>{{ bet.artist1.name }} <span class='text-danger'>vs</span> {{ bet.artist2.name }}</h6>
+                          <h5>Bet Users: {{ bet.bet_users_count }}</h5>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+
+          </div>
+        </div>
+
+        <br><br>
+
+        <div class='card'>
+          <div class='card-header'>
+            <h4>Placed Bets</h4>
+          </div>
+          <div class='card-body'>
+            <table class="table">
+              <thead class="text-primary">
+                <tr>
+                  <th>No</th>
+                  <th class="text-center">Creator</th>
+                  <th class="text-center">Artist1</th>
+                  <th class="text-center">Artist2</th>
+                  <th class="text-center">Win</th>
+                  <th class="text-center">Chip</th>
+                  <th class="text-center">Returns</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for bet_user in bet_users %}
+                <tr>
+                  <td class="text-center">
+                    <a href='/admin/bet/{{ bet_user.bet.pk }}'>
+                      {{ forloop.counter }}
+                    </a>
+                  </td>
+                  <td class="text-center">
+                    <a href='/admin/reports/user/{{ bet_user.bet.creator.user.pk }}'>
+                      <div class="photo" data-toggle="tooltip" title="{{ bet_user.bet.creator.user.username }}">
+                        <img src="{% if bet_user.bet.creator.photo == null %}/static/assets/img/default-avatar.png{% else %}{{ bet_user.bet.creator.photo }}{% endif %}" alt="photo">
+                      </div>
+                    </a>
+                  </td>
+                  <td class="text-center">
+                    <div class="photo" data-toggle="tooltip" title="{{ bet_user.bet.artist1.name }}">
+                      <img src="{% if bet_user.bet.artist1.image_url == null %}/static/assets/img/default-avatar.png{% else %}{{ bet_user.bet.artist1.image_url }}{% endif %}" alt="photo">
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <div class="photo" data-toggle="tooltip" title="{{ bet_user.bet.artist2.name }}">
+                      <img src="{% if bet_user.bet.artist2.image_url == null %}/static/assets/img/default-avatar.png{% else %}{{ bet_user.bet.artist2.image_url }}{% endif %}" alt="photo">
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    {% if bet_user.is_winner and bet_user.is_end %}
+                        <button class="btn btn-icon btn-round btn-success">
+                            <i class="tim-icons icon-trophy"> </i>
+                        </button>
+                    {% elif bet_user.is_winner == False and bet_user.is_end %}
+                        <button class="btn btn-icon btn-round btn-danger btn-sm">
+                          <i class="tim-icons icon-simple-remove"> </i>
+                        </button>
+                    {% elif bet_user.is_winner == None and bet_user.is_end %}
+                        <button class="btn btn-icon btn-round btn-primary btn-sm">
+                          <i class="tim-icons icon-refresh-02"> </i>
+                        </button>
+                    {% else %}
+                        <!-- <button class="btn btn-icon btn-round btn-danger btn-sm">
+                          <i class="tim-icons icon-simple-remove"> </i>
+                        </button> -->
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    {{ bet_user.bet_chip }}
+                  </td>
+                  <td class="text-center">{{ bet_user.return_chip }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <div class="card card-user">
+          <div title="{{ user.user.username }}'s Status" class="user-verify-mark" style='background-color: {% if user.status == 1 %} #00f2c3 {% else %} #ec250d {% endif %};'>
+            <i class='tim-icons {% if user.status == 1 %} icon-check-2 {% else %} icon-simple-remove {% endif %}'></i>
+          </div>
+          <div class="card-body">
+            <p class="card-text">
+              <div class="author">
+                <div class="block block-one"></div>
+                <div class="block block-two"></div>
+                <div class="block block-three"></div>
+                <div class="block block-four"></div>
+                <a href="#">
+                  <img class="avatar" src="{% if user.photo == null %}/static/assets/img/default-avatar.png{% else %}{{ user.photo }}{% endif %}" alt="...">
+                  <h5 class="title">
+                      {{ user.user.username }}
+                  </h5>
+                </a>
+                <p class="description">
+                  {{ user.user.email }}
+                </p>
+                <p class="description">
+                  {{ user.user.first_name }} {{user.user.last_name }}
+                </p>
+                <p class="description">
+                  {{ user.address }}
+                </p>
+              </div>
+            </p>
+            <div class="card-description text-center">
+              <h5>Exp: <span class="text-info">{{ user.exp }}</span>,  Chip: <span class="text-info">{{ user.chip }}</span></h5>
+              <h5>Create Bets: <span class="text-info">{{ user.bets }}</span>,  Bets: <span class="text-info">{{ user.winner_times|add:user.tie_times|add:user.lose_times }}</span></h5>
+              <h5>Win Times: <span class="text-info">{{ user.winner_times }}</span>,  Tie Times: <span class="text-info">{{ user.tie_times }}</span>,  Lose Times: <span class="text-info">{{ user.lose_times }}</span></h5>
+            </div>
+          </div>
+          <div class='card-footer text-right'>
+            <a href="/admin/user/{{ user.user.pk }}">Edit...</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <script>
+    $.ajaxSetup({
+        headers: { "X-CSRFToken": '{{csrf_token}}' }
+    })
+    user_update = "{% url 'admin/users' %}"
+  </script>
+
+{% endblock javascripts %}
